@@ -1,0 +1,45 @@
+﻿@page "/"
+@inject ClientesService _clientesService
+@inject NavigationManager _navManager
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-6">
+    <MudItem Class="my-3">
+        <MudText Typo="Typo.h6">Clientes</MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="lstClientes">
+            <HeaderContent>
+                <MudTh>Nombres Cliente</MudTh>
+                <MudTh>Tipo identificación</MudTh>
+                <MudTh>Tipo persona</MudTh>
+                <MudTh>Identificacion</MudTh>
+                <MudTh>Teléfono</MudTh>
+                <MudTh>Consultar cuentas</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.nombres @context.apellidos</MudTd>
+                <MudTd>@context.tipoIdentificacion</MudTd>
+                <MudTd>@context.tipoPersona</MudTd>
+                <MudTd>@context.identificacion</MudTd>
+                <MudTd>@context.telefono</MudTd>
+                <MudTd>
+                    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.AccountBox" Size="Size.Small" OnClick="(()=>Navigate(context.id))"></MudFab>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+</MudContainer>
+
+@code {
+
+    List<Cliente> lstClientes = new List<Cliente>();
+    protected override async Task OnInitializedAsync()
+    {
+        lstClientes = await _clientesService.GetClientes();
+    }
+    private void Navigate(int id)
+    {
+        _navManager.NavigateTo($"/cuenta/{id}");   
+    }
+
+}

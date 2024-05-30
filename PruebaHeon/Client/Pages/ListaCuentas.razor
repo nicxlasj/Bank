@@ -1,0 +1,134 @@
+﻿@page "/cuenta/"
+@page "/cuenta/{id:int}"
+@inject CuentasService _cuentasService
+@inject ISnackbar _snackBar
+
+<style>
+    .mud-input > input.mud-input-root-outlined, div.mud-input-slot.mud-input-root-outlined {
+        padding: 6px 0px;
+        /* font-size: smaller; */
+    }
+
+    .mud-table-dense * .mud-table-row .mud-table-cell {
+        padding-inline-start: 6px;
+        padding-inline-end: 6px;
+    }
+</style>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudItem Class="my-3">
+        <MudText Typo="Typo.h6" >Cuentas bancarias</MudText>
+    </MudItem>
+    <MudPaper Width="100%">
+        <MudGrid>
+            <MudItem xs="3" Class="mx-3">
+                <MudNumericField @bind-Value="id" Class="mb-3" Margin="Margin.Dense" MaxLength="256  "
+                                 Label="Id" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge"></MudNumericField>
+            </MudItem>
+            <MudItem xs="4" Class="mx-3">
+                <MudTextField @bind-Value="cuenta.nombresCliente" Class="mb-3" Margin="Margin.Dense" MaxLength="256"
+                              Label="Nombres cliente" Variant="Variant.Filled" Disabled="true"></MudTextField>
+            </MudItem>
+            
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+ 
+<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        <MudGrid>
+            <MudItem Class="d-flex justify-end" xs="12">
+                <MudFab Color="Color.Primary"
+                        StartIcon="@Icons.Material.Filled.Add"
+                        Size="Size.Small"
+                    IconSize="Size.Small" OnClick="AddCuenta" />
+            </MudItem>
+        </MudGrid>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTable Items="@lstCuentas">
+                    <HeaderContent>
+                        <MudTh>Tipo cuenta</MudTh>
+                        <MudTh>Número cuenta</MudTh>
+                        <MudTh>Saldo</MudTh>
+                        <MudTh>Guardar</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                        <MudSelect T="TipoCuenta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-3" Value="context.tipoCuenta" Placeholder="Seleccione" ValueChanged="@((e)=> OnSelectedValueChangedTipoCuenta(context, e))">
+                                @if (lstTipoCuentas.Any())
+                                {
+                                    @foreach (var item in lstTipoCuentas)
+                                    {
+                                        <MudSelectItem Value="item">@item.descripcion</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+
+                        </MudTd>
+                        <MudTd>
+                        <MudNumericField @bind-Value="context.numeroCuenta" Class="mb-3" Margin="Margin.None" MaxLength="256" Variant="Variant.Outlined" Adornment="Adornment.End"></MudNumericField>
+                        </MudTd>
+                        <MudTd>
+                        <MudNumericField @bind-Value="context.saldo" Class="mb-3" Margin="Margin.None" MaxLength="256  "
+                                         Variant="Variant.Outlined" Adornment="Adornment.End"></MudNumericField>
+                        </MudTd>
+                        <MudTd>
+                            <MudFab Color="Color.Primary"
+                                    StartIcon="@Icons.Material.Filled.Save"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    OnClick="@(()=> SaveCuenta(context))"/>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+
+
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    List<Cuenta> lstCuentas = new List<Cuenta>();
+    Cuenta cuenta = new();
+    List<TipoCuenta> lstTipoCuentas = new List<TipoCuenta>();
+    protected override async Task OnInitializedAsync()
+    {
+        if (id != 0)
+        {
+            lstCuentas = await _cuentasService.GetCuentas(id);
+            cuenta = lstCuentas.First();
+            lstTipoCuentas = await _cuentasService.GetTipoCuentas();
+            foreach (var item in lstCuentas)
+            {
+                item.tipoCuenta = lstTipoCuentas.Where(x => x.id == item.idTipoCuenta).SingleOrDefault()!;
+            }
+        }   
+
+    }
+
+    private async Task SaveCuenta(Cuenta cuenta)
+    {
+        await _cuentasService.SaveCuenta(cuenta);
+        _snackBar.Add("Cuenta guardada exitosamente", Severity.Success, a => a.VisibleStateDuration = 1000);
+    }
+
+    private void AddCuenta()
+    {
+        lstCuentas.Add(new Cuenta { idCliente = lstCuentas.First().id });    
+    }
+    private void OnSelectedValueChangedTipoCuenta(Cuenta cuenta, TipoCuenta tipoCuenta)
+    {
+        foreach (var item in lstCuentas)
+        {
+            if (item.Equals(cuenta))
+            {
+                item.tipoCuenta = tipoCuenta;
+                item.idTipoCuenta = tipoCuenta.id;
+            }
+        }
+    }
+}
