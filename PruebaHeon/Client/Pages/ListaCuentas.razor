@@ -2,6 +2,8 @@
 @page "/cuenta/{id:int}"
 @inject CuentasService _cuentasService
 @inject ISnackbar _snackBar
+@inject IDialogService _dialogService
+
 
 <style>
     .mud-input > input.mud-input-root-outlined, div.mud-input-slot.mud-input-root-outlined {
@@ -23,7 +25,7 @@
         <MudGrid>
             <MudItem xs="3" Class="mx-3">
                 <MudNumericField @bind-Value="id" Class="mb-3" Margin="Margin.Dense" MaxLength="256  "
-                                 Label="Id" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge"></MudNumericField>
+                                 Label="Id" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" HideSpinButtons="true"></MudNumericField>
             </MudItem>
             <MudItem xs="4" Class="mx-3">
                 <MudTextField @bind-Value="cuenta.nombresCliente" Class="mb-3" Margin="Margin.Dense" MaxLength="256"
@@ -52,6 +54,7 @@
                         <MudTh>Número cuenta</MudTh>
                         <MudTh>Saldo</MudTh>
                         <MudTh>Guardar</MudTh>
+                        <MudTh>Consignación/Retiro</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>
@@ -67,11 +70,11 @@
 
                         </MudTd>
                         <MudTd>
-                        <MudNumericField @bind-Value="context.numeroCuenta" Class="mb-3" Margin="Margin.None" MaxLength="256" Variant="Variant.Outlined" Adornment="Adornment.End"></MudNumericField>
+                        <MudNumericField @bind-Value="context.numeroCuenta" Class="mb-3" Margin="Margin.None" MaxLength="5" Variant="Variant.Outlined" Adornment="Adornment.End" HideSpinButtons="true"></MudNumericField>
                         </MudTd>
                         <MudTd>
                         <MudNumericField @bind-Value="context.saldo" Class="mb-3" Margin="Margin.None" MaxLength="256  "
-                                         Variant="Variant.Outlined" Adornment="Adornment.End"></MudNumericField>
+                                         Variant="Variant.Outlined" Adornment="Adornment.End" HideSpinButtons="true"></MudNumericField>
                         </MudTd>
                         <MudTd>
                             <MudFab Color="Color.Primary"
@@ -79,6 +82,18 @@
                                     Size="Size.Small"
                                     IconSize="Size.Small"
                                     OnClick="@(()=> SaveCuenta(context))"/>
+                        </MudTd>
+                        <MudTd>
+                        <MudFab Color="Color.Tertiary"
+                                StartIcon="@Icons.Material.Filled.AttachMoney"
+                                Size="Size.Small"
+                                IconSize="Size.Small"
+                                OnClick="@(()=> AbrirModConsignacion(context))"/>
+                        <MudFab Color="Color.Secondary"
+                                StartIcon="@Icons.Material.Filled.MoneyOff"
+                                Size="Size.Small"
+                                IconSize="Size.Small"
+                                />
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -130,5 +145,13 @@
                 item.idTipoCuenta = tipoCuenta.id;
             }
         }
+    }
+
+    private void AbrirModConsignacion(Cuenta cuenta)
+    {
+        var parameters = new DialogParameters { ["cuenta"] = cuenta };
+        var dialog = _dialogService.Show<ModCuentaConsignacion>("Consignación", parameters);
+        
+
     }
 }

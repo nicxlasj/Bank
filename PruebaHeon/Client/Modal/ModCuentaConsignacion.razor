@@ -1,0 +1,98 @@
+﻿@using System.Globalization
+@inject TransaccionService _transaccionService
+
+<MudDialog Style="width: 400px">
+    <DialogContent >
+        <MudContainer Style="max-height: 500px overflow-y: scroll">
+            <EditForm Model="cuenta">
+                <MudTextField @bind-Value="cuenta.numeroCuenta" Label="Numero cuenta" Disabled Variant="Variant.Text">
+
+                </MudTextField>
+                 <MudNumericField @bind-Value="_transaccion.monto" Label="Monto" Variant="Variant.Text" HideSpinButtons="true" Format="N2" Culture="@_en">
+
+                 </MudNumericField>
+                 <MudSelect T="FormaPago" @bind-Value="formaPagoSeleccionado" Variant="Variant.Outlined" Placeholder="Seleccione" AnchorOrigin="Origin.BottomCenter" Label="Forma de pago" Class="mt-3">
+                        @if (lstFormaPago.Any())
+                        {
+                            @foreach (var item in lstFormaPago)
+                            {
+                                <MudSelectItem Value="item">@item.descripcion</MudSelectItem>
+                            }
+                        }
+                </MudSelect>
+
+
+                 @if(formaPagoSeleccionado.id == 1)
+                {
+                    
+                        <MudSelect T="Banco" Value="bancoSeleccionado" Label="Banco" Variant="Variant.Outlined" Placeholder="Seleccione" AnchorOrigin="Origin.BottomCenter" Class="mt-3" ValueChanged="OnSelectedValueChangedBanco">
+                            @if (lstBancos.Any())
+                            {
+                                @foreach (var item in lstBancos)
+                                {
+                                    <MudSelectItem Value="item">@item.nombre</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                    <MudNumericField @bind-Value="_transaccion.numeroCheque" Label="Número cheque" Variant="Variant.Text" HideSpinButtons="true">
+
+                    </MudNumericField>
+                }        
+            </EditForm>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cerrar</MudButton>
+         <MudButton Variant="Variant.Filled" Color="Color.Primary">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public Cuenta cuenta { get; set; } = new();
+
+    Transaccion _transaccion = new();
+
+    List<FormaPago> lstFormaPago = new List<FormaPago>();
+
+    FormaPago formaPagoSeleccionado = new();
+
+    List<Banco> lstBancos = new List<Banco>();
+
+    Banco bancoSeleccionado = new();
+
+    public CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
+
+    [CascadingParameter]
+    public MudDialogInstance? MudDialog { get; set; }
+
+    private void Cancel() => MudDialog?.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lstFormaPago = await GetFormasPago();
+        lstBancos = await GetBancos();
+
+    }
+
+    private async Task<List<FormaPago>> GetFormasPago()
+    {
+        return await _transaccionService.GetFormasPago();
+    }
+    private async Task<List<Banco>> GetBancos()
+    {
+        return await _transaccionService.GetBancos();
+    }
+
+    private void OnSelectedValueChangedFormaPago(FormaPago formaPago)
+    {
+        _transaccion.idFormaPago = formaPago.id;
+        formaPagoSeleccionado = formaPago;
+    }
+    private void OnSelectedValueChangedBanco(Banco banco)
+    {
+        _transaccion.idBanco = banco.id;
+        bancoSeleccionado = banco;
+    }
+
+}

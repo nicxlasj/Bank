@@ -52,7 +52,7 @@ ALTER TABLE Cliente ADD CONSTRAINT [FK_Cliente_TipoIdentificacion] FOREIGN KEY (
 ALTER TABLE Cliente ADD CONSTRAINT [FK_Cliente_TipoPersona] FOREIGN KEY (idTipoPersona) REFERENCES TipoPersona(id);
 
 INSERT INTO Cliente(idTipoIdentificacion, idTipoPersona, nombres, apellidos, identificacion, telefono) 
-	SELECT 1, 1, 'Nicol�s', 'Jaiquel Rubio', '1019990889', '3016027717';
+	SELECT 1, 1, 'Nicolás', 'Jaiquel Rubio', '1019990889', '3016027717';
 
 INSERT INTO Cliente(idTipoIdentificacion, idTipoPersona, nombres, apellidos, identificacion, telefono) 
 	SELECT 1, 1, 'Jose Manuel', 'Delgado', '1019990982', '1122334455';

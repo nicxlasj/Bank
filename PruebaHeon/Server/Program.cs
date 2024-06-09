@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<CuentasService>();
+builder.Services.AddScoped<TransaccionService>();
 
 var app = builder.Build();
 
