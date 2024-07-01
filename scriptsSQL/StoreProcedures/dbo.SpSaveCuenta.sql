@@ -22,6 +22,7 @@ BEGIN
 		UPDATE Cuenta
 		SET idTipoCuenta = @idTipoCuenta,
 		saldo = @saldo,
-		fechaEdicion = GETDATE();
+		fechaEdicion = GETDATE()
+		WHERE id = @id;
 	END
 END

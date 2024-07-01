@@ -1,0 +1,37 @@
+﻿<MudDialog Style="width: 800px">
+    <DialogContent>
+        <MudContainer Style="max-height: 500px overflow-y: scroll">
+            <MudTable Items="@lstTransacciones" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>Nombre titular</MudTh>
+                    <MudTh>Numero de cuenta</MudTh>
+                    <MudTh>Tipo transaccion</MudTh>
+                    <MudTh>Monto</MudTh>
+                    <MudTh>Forma de pago</MudTh>
+                    <MudTh>Fecha</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.nombresCliente</MudTd>
+                    <MudTd>@context.numeroCuenta</MudTd>
+                    <MudTd>@context.tipoTransaccion</MudTd>
+                    <MudTd>@context.monto</MudTd>
+                    <MudTd>@(()=> context.idTipoTransaccion == 3 ? "" : context.formaPago)</MudTd>
+                    <MudTd>@context.fechaCreacion</MudTd>
+                </RowTemplate>
+            </MudTable>        
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public List<Transaccion> lstTransacciones { get; set; } = new List<Transaccion>();
+
+    [CascadingParameter]
+    public MudDialogInstance? MudDialog { get; set; }
+
+
+}

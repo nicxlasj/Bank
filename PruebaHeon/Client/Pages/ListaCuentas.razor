@@ -1,6 +1,7 @@
 ﻿@page "/cuenta/"
 @page "/cuenta/{id:int}"
 @inject CuentasService _cuentasService
+@inject TransaccionService _transaccionService
 @inject ISnackbar _snackBar
 @inject IDialogService _dialogService
 
@@ -25,7 +26,7 @@
         <MudGrid>
             <MudItem xs="3" Class="mx-3">
                 <MudNumericField @bind-Value="id" Class="mb-3" Margin="Margin.Dense" MaxLength="256  "
-                                 Label="Id" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" HideSpinButtons="true"></MudNumericField>
+                                 Label="Id" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" HideSpinButtons="true" OnBlur="(()=> GetCuentas(id))"></MudNumericField>
             </MudItem>
             <MudItem xs="4" Class="mx-3">
                 <MudTextField @bind-Value="cuenta.nombresCliente" Class="mb-3" Margin="Margin.Dense" MaxLength="256"
@@ -47,7 +48,7 @@
             </MudItem>
         </MudGrid>
         <MudGrid>
-            <MudItem xs="12">
+            <MudItem xs="20">
                 <MudTable Items="@lstCuentas">
                     <HeaderContent>
                         <MudTh>Tipo cuenta</MudTh>
@@ -55,6 +56,7 @@
                         <MudTh>Saldo</MudTh>
                         <MudTh>Guardar</MudTh>
                         <MudTh>Consignación/Retiro</MudTh>
+                        <MudTh>Historico Transacciones</MudTh> 
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>
@@ -93,6 +95,16 @@
                                 StartIcon="@Icons.Material.Filled.MoneyOff"
                                 Size="Size.Small"
                                 IconSize="Size.Small"
+                                OnClick="@(()=> AbrirModRetiro(context))"
+                               
+                                />
+                        </MudTd>
+                        <MudTd>
+                        <MudFab Color="Color.Primary"
+                                StartIcon="@Icons.Material.Filled.History"
+                                Size="Size.Small"
+                                IconSize="Size.Small" 
+                                OnClick="@(()=> AbrirModTransaccionHistorico(context))"
                                 />
                         </MudTd>
                     </RowTemplate>
@@ -100,10 +112,6 @@
             </MudItem>
         </MudGrid>
     </MudContainer>
-
-
-
-
 @code {
     [Parameter]
     public int id { get; set; }
@@ -114,13 +122,7 @@
     {
         if (id != 0)
         {
-            lstCuentas = await _cuentasService.GetCuentas(id);
-            cuenta = lstCuentas.First();
-            lstTipoCuentas = await _cuentasService.GetTipoCuentas();
-            foreach (var item in lstCuentas)
-            {
-                item.tipoCuenta = lstTipoCuentas.Where(x => x.id == item.idTipoCuenta).SingleOrDefault()!;
-            }
+            await GetCuentas(id);   
         }   
 
     }
@@ -130,6 +132,18 @@
         await _cuentasService.SaveCuenta(cuenta);
         _snackBar.Add("Cuenta guardada exitosamente", Severity.Success, a => a.VisibleStateDuration = 1000);
     }
+
+    private async Task GetCuentas(int id)
+    {
+        lstCuentas = await _cuentasService.GetCuentas(id);
+        cuenta = lstCuentas.First();
+        lstTipoCuentas = await _cuentasService.GetTipoCuentas();
+        foreach (var item in lstCuentas)
+        {
+            item.tipoCuenta = lstTipoCuentas.Where(x => x.id == item.idTipoCuenta).SingleOrDefault()!;
+        }
+    }
+
 
     private void AddCuenta()
     {
@@ -147,11 +161,30 @@
         }
     }
 
-    private void AbrirModConsignacion(Cuenta cuenta)
+    private async void AbrirModConsignacion(Cuenta cuenta)
     {
-        var parameters = new DialogParameters { ["cuenta"] = cuenta };
+        var parameters = new DialogParameters { ["cuenta"] = cuenta, ["tipoTransaccion"] = 2 };
         var dialog = _dialogService.Show<ModCuentaConsignacion>("Consignación", parameters);
-        
+        var result = await dialog.Result;
+
+        await GetCuentas(cuenta.idCliente);
+
 
     }
+    private async void AbrirModRetiro(Cuenta cuenta)
+    {
+        var parameters = new DialogParameters { ["cuenta"] = cuenta, ["tipoTransaccion"] = 3 };
+        var dialog = _dialogService.Show<ModCuentaConsignacion>("Retiro", parameters);
+        var result = await dialog.Result;
+
+        await GetCuentas(cuenta.idCliente);
+
+    }
+
+    private async void AbrirModTransaccionHistorico(Cuenta cuenta)
+    {
+        var lstTransacciones = await _transaccionService.GetTransacciones(cuenta.id);
+        var parameters = new DialogParameters { ["lstTransacciones"] = lstTransacciones };
+    }
+
 }

@@ -34,5 +34,19 @@ namespace PruebaHeon.Server.Services
             return result.ToList();
         }
 
+        public async Task ConsignacionCuenta(Transaccion transaccion)
+        {
+            if (transaccion.idBanco == 0 || transaccion.idFormaPago == 0)
+            {
+                transaccion.idBanco = null;
+                transaccion.idFormaPago = null;
+            }
+            ScriptSQL scriptSQL = new ScriptSQL { scriptText = "[dbo].[SpConsignacionCuenta]", parameters = new { idCuenta = transaccion.idCuenta, idFormaPago = transaccion.idFormaPago, numeroCheque = transaccion.numeroCheque, idBanco = transaccion.idBanco, monto = transaccion.monto, idTipoTransaccion = transaccion.idTipoTransaccion } };
+            using var db = new SqlConnection(_connectionString);
+            var result = await db.ExecuteAsync(scriptSQL.scriptText, scriptSQL.parameters);
+
+
+        }
+
     }
 }

@@ -1,5 +1,7 @@
 ﻿@using System.Globalization
 @inject TransaccionService _transaccionService
+@inject ISnackbar _snackBar
+
 
 <MudDialog Style="width: 400px">
     <DialogContent >
@@ -11,18 +13,21 @@
                  <MudNumericField @bind-Value="_transaccion.monto" Label="Monto" Variant="Variant.Text" HideSpinButtons="true" Format="N2" Culture="@_en">
 
                  </MudNumericField>
-                 <MudSelect T="FormaPago" @bind-Value="formaPagoSeleccionado" Variant="Variant.Outlined" Placeholder="Seleccione" AnchorOrigin="Origin.BottomCenter" Label="Forma de pago" Class="mt-3">
-                        @if (lstFormaPago.Any())
-                        {
-                            @foreach (var item in lstFormaPago)
+                 @if (_transaccion.idTipoTransaccion != 3)
+                {
+                     <MudSelect T="FormaPago" Value="formaPagoSeleccionado" Variant="Variant.Outlined" Placeholder="Seleccione" AnchorOrigin="Origin.BottomCenter" Label="Forma de pago" Class="mt-3" ValueChanged="OnSelectedValueChangedFormaPago">
+                            @if (lstFormaPago.Any())
                             {
-                                <MudSelectItem Value="item">@item.descripcion</MudSelectItem>
+                                @foreach (var item in lstFormaPago)
+                                {
+                                    <MudSelectItem Value="item">@item.descripcion</MudSelectItem>
+                                }
                             }
-                        }
-                </MudSelect>
+                    </MudSelect>
+                }
 
 
-                 @if(formaPagoSeleccionado.id == 1)
+                 @if(formaPagoSeleccionado.id == 1 && _transaccion.idTipoTransaccion != 3)
                 {
                     
                         <MudSelect T="Banco" Value="bancoSeleccionado" Label="Banco" Variant="Variant.Outlined" Placeholder="Seleccione" AnchorOrigin="Origin.BottomCenter" Class="mt-3" ValueChanged="OnSelectedValueChangedBanco">
@@ -43,13 +48,16 @@
     </DialogContent>
     <DialogActions>
          <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cerrar</MudButton>
-         <MudButton Variant="Variant.Filled" Color="Color.Primary">Guardar</MudButton>
+         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConsignacionCuenta">Guardar</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [Parameter]
     public Cuenta cuenta { get; set; } = new();
+
+    [Parameter]
+    public int tipoTransaccion { get; set; }
 
     Transaccion _transaccion = new();
 
@@ -64,7 +72,7 @@
     public CultureInfo _en = CultureInfo.GetCultureInfo("en-US");
 
     [CascadingParameter]
-    public MudDialogInstance? MudDialog { get; set; }
+    public MudDialogInstance? MudDialog { get; set; }   
 
     private void Cancel() => MudDialog?.Cancel();
 
@@ -72,6 +80,11 @@
     {
         lstFormaPago = await GetFormasPago();
         lstBancos = await GetBancos();
+        if (tipoTransaccion == 3)
+            _transaccion.idTipoTransaccion = 3;
+        else if (tipoTransaccion == 2)
+            _transaccion.idTipoTransaccion = 2;
+
 
     }
 
@@ -82,6 +95,14 @@
     private async Task<List<Banco>> GetBancos()
     {
         return await _transaccionService.GetBancos();
+    }
+
+    private async Task ConsignacionCuenta()
+    {
+        _transaccion.idCuenta = cuenta.id;
+        await _transaccionService.ConsignacionCuenta(_transaccion);
+        _snackBar.Add("Transacción realizada con éxito", Severity.Success, a => a.VisibleStateDuration = 1000);
+
     }
 
     private void OnSelectedValueChangedFormaPago(FormaPago formaPago)

@@ -29,6 +29,12 @@ namespace PruebaHeon.Server.Controllers
         {
             return await _transaccionService.GetBancos();
         }
+        [HttpPost("consignacion")]
+        public async Task ConsignacionCuenta(Transaccion transaccion) 
+        {
+            await _transaccionService.ConsignacionCuenta(transaccion);
+        }
+
 
     }
 }
