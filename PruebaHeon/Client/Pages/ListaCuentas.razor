@@ -56,7 +56,7 @@
                         <MudTh>Saldo</MudTh>
                         <MudTh>Guardar</MudTh>
                         <MudTh>Consignación/Retiro</MudTh>
-                        <MudTh>Historico Transacciones</MudTh> 
+                        <MudTh>Historico Transacciones</MudTh>  
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>
@@ -185,6 +185,8 @@
     {
         var lstTransacciones = await _transaccionService.GetTransacciones(cuenta.id);
         var parameters = new DialogParameters { ["lstTransacciones"] = lstTransacciones };
+        var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium};
+        var dialog = _dialogService.Show<ModTransaccionHistorico>("Historico transacciones", parameters, options);
     }
 
 }

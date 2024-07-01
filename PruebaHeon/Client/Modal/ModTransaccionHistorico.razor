@@ -1,6 +1,6 @@
-﻿<MudDialog Style="width: 800px">
+﻿<MudDialog>
     <DialogContent>
-        <MudContainer Style="max-height: 500px overflow-y: scroll">
+        <MudContainer>
             <MudTable Items="@lstTransacciones" Hover="true" Breakpoint="Breakpoint.Sm">
                 <HeaderContent>
                     <MudTh>Nombre titular</MudTh>
@@ -15,14 +15,21 @@
                     <MudTd>@context.numeroCuenta</MudTd>
                     <MudTd>@context.tipoTransaccion</MudTd>
                     <MudTd>@context.monto</MudTd>
-                    <MudTd>@(()=> context.idTipoTransaccion == 3 ? "" : context.formaPago)</MudTd>
+                    @if (context.idTipoTransaccion == 3)
+                    {
+                        <MudTd></MudTd>
+                    }
+                    else
+                    {
+                        <MudTd>@context.formaPago</MudTd>
+                    }
                     <MudTd>@context.fechaCreacion</MudTd>
                 </RowTemplate>
             </MudTable>        
         </MudContainer>
     </DialogContent>
     <DialogActions>
-
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cerrar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -33,5 +40,7 @@
     [CascadingParameter]
     public MudDialogInstance? MudDialog { get; set; }
 
+    private void Cancel() => MudDialog?.Cancel();
 
+   
 }
