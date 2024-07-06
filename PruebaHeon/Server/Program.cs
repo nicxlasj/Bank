@@ -10,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<CuentasService>();
 builder.Services.AddScoped<TransaccionService>();
+builder.Services.AddScoped<LoginService>();
 
 var app = builder.Build();
 

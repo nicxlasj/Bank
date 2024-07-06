@@ -8,6 +8,8 @@
 	DROP TABLE FormaPago;
 	DROP TABLE TipoTransaccion;
 	DROP TABLE Transaccion;
+	DROP TABLE Rol;
+	DROP TABLE Usuario;
 */
 
 CREATE TABLE TipoIdentificacion(
@@ -161,3 +163,31 @@ INNER JOIN TipoTransaccion tt WITH(NOLOCK) ON tt.id = t.idTipoTransaccion
 INNER JOIN Cuenta c WITH(NOLOCK) ON c.id = t.idCuenta
 INNER JOIN Cliente cc WITH(NOLOCK) ON cc.id = c.idCliente
 INNER JOIN FormaPago fp WITH(NOLOCK) ON fp.id = t.idFormaPago
+
+CREATE TABLE Rol(
+	id INT IDENTITY,
+	descripcion VARCHAR(70),
+	fechaCreacion DATETIME,
+	fechaEdicion DATETIME
+	PRIMARY KEY (id)
+);
+ALTER TABLE Rol ADD CONSTRAINT [DF_Rol_fechaCreacion] DEFAULT GETDATE() FOR fechaCreacion;
+
+INSERT INTO Rol(descripcion) SELECT 'admin';
+
+CREATE TABLE Usuario(
+	id INT IDENTITY,
+	idRol INT,
+	username VARCHAR(200),
+	password VARCHAR(250),
+	fechaCreacion DATETIME,
+	fechaEdicion DATETIME
+	PRIMARY KEY (id)
+);
+ALTER TABLE Usuario ADD CONSTRAINT [DF_Usuario_fechaCreacion] DEFAULT GETDATE() FOR fechaCreacion;
+ALTER TABLE Usuario ADD CONSTRAINT [FK_Usuario_Rol] FOREIGN KEY (idRol) REFERENCES Rol(id);
+
+INSERT INTO Usuario(username, password, idRol) SELECT 'nicxlasj', 'abc123', 1;
+
+SELECT u.*, r.descripcion as rol FROM Usuario u WITH(NOLOCK)
+INNER JOIN Rol r WITH(NOLOCK) ON r.id = u.idRol;
