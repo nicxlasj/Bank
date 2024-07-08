@@ -11,7 +11,7 @@ namespace PruebaHeon.Server.Services
         private readonly string  _connectionString;
         public LoginService(IConfiguration configuration) 
         {
-            _connectionString = configuration.GetConnectionString("localdb")!;
+            _connectionString = configuration.GetConnectionString("dbConnection")!;
         }
 
         public async Task<List<Usuario>> GetUsuarios(Usuario usuario) 

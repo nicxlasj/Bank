@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Dapper;
 using PruebaHeon.Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PruebaHeon.Server.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class TipoCuentaController : ControllerBase
     {

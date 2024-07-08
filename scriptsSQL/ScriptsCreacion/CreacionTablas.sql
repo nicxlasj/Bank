@@ -174,6 +174,7 @@ CREATE TABLE Rol(
 ALTER TABLE Rol ADD CONSTRAINT [DF_Rol_fechaCreacion] DEFAULT GETDATE() FOR fechaCreacion;
 
 INSERT INTO Rol(descripcion) SELECT 'admin';
+INSERT INTO Rol(descripcion) SELECT 'viewer';
 
 CREATE TABLE Usuario(
 	id INT IDENTITY,
@@ -188,6 +189,7 @@ ALTER TABLE Usuario ADD CONSTRAINT [DF_Usuario_fechaCreacion] DEFAULT GETDATE() 
 ALTER TABLE Usuario ADD CONSTRAINT [FK_Usuario_Rol] FOREIGN KEY (idRol) REFERENCES Rol(id);
 
 INSERT INTO Usuario(username, password, idRol) SELECT 'nicxlasj', 'abc123', 1;
+INSERT INTO Usuario(username, password, idRol) SELECT 'alex', '1207', 2;
 
 SELECT u.*, r.descripcion as rol FROM Usuario u WITH(NOLOCK)
 INNER JOIN Rol r WITH(NOLOCK) ON r.id = u.idRol;

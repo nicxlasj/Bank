@@ -1,5 +1,10 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using PruebaHeon.Server.Services;
+using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +16,23 @@ builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<CuentasService>();
 builder.Services.AddScoped<TransaccionService>();
 builder.Services.AddScoped<LoginService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+    AddJwtBearer((options) =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:key").Value!)),
+            ValidateIssuer = true,
+            ValidateAudience = true
+        };
+    });
+
+builder.Services.AddAuthorization((options) =>
+    {
+        options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(claimType: ClaimTypes.Role, "admin"));
+    });
 
 var app = builder.Build();
 
@@ -32,6 +54,9 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.MapRazorPages();
