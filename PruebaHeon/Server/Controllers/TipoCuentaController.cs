@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PruebaHeon.Server.Controllers
 {
-    [Route("api/[controller]")]
     [Authorize]
+    [Route("api/[controller]")]
     [ApiController]
     public class TipoCuentaController : ControllerBase
     {

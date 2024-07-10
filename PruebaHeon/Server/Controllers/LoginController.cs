@@ -37,8 +37,9 @@ namespace PruebaHeon.Server.Controllers
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:key").Value!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddMinutes(60), signingCredentials: creds);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var securityToken = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddMinutes(60), signingCredentials: creds);
+            var token = new JwtSecurityTokenHandler().WriteToken(securityToken);
+            return token;
         }
     }
 }

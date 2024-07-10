@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject ClientesService _clientesService
 @inject NavigationManager _navManager
+@inject ILocalStorageService _localStorage
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-6">
     <MudItem Class="my-3">
@@ -33,9 +34,18 @@
 @code {
 
     List<Cliente> lstClientes = new List<Cliente>();
+
     protected override async Task OnInitializedAsync()
     {
+        var token = await _localStorage.GetItemAsync<string>("token");
+        if (token is null)
+        {
+            _navManager.NavigateTo("/login");
+            return;
+
+        }
         lstClientes = await _clientesService.GetClientes();
+        
     }
     private void Navigate(int id)
     {
