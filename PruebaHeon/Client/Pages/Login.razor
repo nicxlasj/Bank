@@ -1,7 +1,51 @@
 ﻿@page "/login"
+@inject LoginService _loginService
+@inject ILocalStorageService _localStorage
+@inject NavigationManager _navManager
+@layout LoginLayout 
 
-<h1>Hello world</h1>
+<style>
+	.custom-textfield .mud-input  {
+		height: 40px;
+		font-size: 15px; 
+		
+	}
+	.custom-labelfield .mud-input-label{
+		font-size: 20px;
+		margin-bottom: 12px;
+
+	}
+</style>
+
+<MudForm Model="@usuario">
+	<MudCardContent>
+		<MudTextField @bind-Value="usuario.username"
+						  
+							  Immediate="true"
+					  Variant="Variant.Outlined" Class="custom-textfield" Label="Username"/>
+
+		<MudTextField @bind-Value="usuario.password"
+							  
+							  Immediate="true"
+					  Variant="Variant.Outlined" Class="custom-textfield" Label="Password" InputType="InputType.Password"/>
+							  <br />
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@(()=> Auth(usuario))">Log In</MudButton>
+    </MudCardContent>
+</MudForm>
+
 
 @code {
+
+	Usuario usuario = new();
+
+	private async Task Auth(Usuario usuario)
+	{
+		var token = await _loginService.Login(usuario);
+		if (token is not null)
+		{
+			await _localStorage.SetItemAsStringAsync("token", token);
+			_navManager.NavigateTo("/");
+		}
+	}
 
 }

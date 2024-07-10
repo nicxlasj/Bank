@@ -12,6 +12,7 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<CuentasService>();
 builder.Services.AddScoped<TransaccionService>();
+builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddBlazoredLocalStorage();

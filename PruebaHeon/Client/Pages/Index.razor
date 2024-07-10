@@ -44,7 +44,10 @@
             return;
 
         }
-        lstClientes = await _clientesService.GetClientes();
+        else
+        {
+            lstClientes = await _clientesService.GetClientes(token);
+        }
         
     }
     private void Navigate(int id)
